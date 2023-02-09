@@ -1,7 +1,6 @@
 import praw
 import credentials.reddit
-from sources.common import NewsSourceInterface, Article, TimeFilter
-from newspaper import Article as NewspaperArticle
+from sources.common import NewsSourceInterface, WebArticle, TimeFilter
 
 class SubredditSource(NewsSourceInterface):
 
@@ -23,12 +22,9 @@ class SubredditSource(NewsSourceInterface):
         for submission in self._reddit.subreddit(self._subreddit).top(
             limit=num, time_filter=time_filter.value
         ):
-            news_article = NewspaperArticle(submission.url)
-            news_article.download()
-            news_article.parse()
             
-            if(len(news_article.text) > self.MIN_CONTENT_CHAR_LENGTH):
-                article = Article(submission.url, submission.title, news_article.text)
+            article = WebArticle(submission.url)
+            if len(article.get_full_content()) > self.MIN_CONTENT_CHAR_LENGTH:
                 top_articles.append(article)
 
         return top_articles
